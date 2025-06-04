@@ -12,6 +12,10 @@ python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 python scripts/run_full_pipeline.py
 ```
+### Repository layout
+- `src/` – production Python package with submodules for data, autoencoder, clustering, RL and backtesting
+- `scripts/` – entry points and utilities
+- `notebooks/` – Jupyter notebooks demonstrating the pipeline
 
 ## Pipeline Overview
 
