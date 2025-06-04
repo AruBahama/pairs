@@ -10,7 +10,7 @@ git clone <your‑fork> pairs_trading_system
 cd pairs_trading_system
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python scripts/run_full_pipeline.py
+python run_full_pipeline.py
 ```
 
 ## Pipeline Overview
