@@ -1,0 +1,14 @@
+
+pandas>=2.2
+numpy>=1.26
+yfinance>=0.2
+financetoolkit>=2.0
+pandas-ta>=0.3
+scikit-learn>=1.5
+tensorflow>=2.16
+ray[rllib]>=2.10
+gymnasium>=0.29
+matplotlib>=3.9
+seaborn>=0.13
+tqdm>=4.66
+python-dotenv>=1.0
