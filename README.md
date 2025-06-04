@@ -10,7 +10,7 @@ git clone <your‑fork> pairs_trading_system
 cd pairs_trading_system
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python scripts/run_full_pipeline.py
+python -m src.run_full_pipeline
 ```
 
 ## Pipeline Overview
@@ -23,5 +23,21 @@ python scripts/run_full_pipeline.py
 6. **Backtest** → PnL, annual %, beta, alpha, MDD, Sharpe, Sortino, Calmar  
 
 All notebooks under `/notebooks` are executable in order and call the production code in `src/`.
+
+### After the refactor
+
+The codebase now lives under a `src/` package with submodules for data
+handling, autoencoder training, clustering and RL agents.  Install the
+required packages with
+
+```bash
+pip install -r requirements.txt
+```
+
+Then execute the full pipeline as
+
+```bash
+python -m src.run_full_pipeline
+```
 
 ---
