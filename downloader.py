@@ -1,0 +1,28 @@
+
+"""Download OHLCV and align to quarter‑end."""
+import pandas as pd, yfinance as yf
+from pathlib import Path
+from ..config import RAW_DIR, START_DATE, END_DATE, TICKER_FILE
+
+def align_to_quarter_end(df):
+    df = df.resample("B").ffill()
+    return df.loc[df.index.isin(df.resample("Q").last().index)]
+
+def download(ticker:str):
+    data = yf.download(ticker,start=START_DATE,end=END_DATE,progress=False)
+    if data.empty:
+        print(f"No data for {ticker}")
+        return
+    data = align_to_quarter_end(data)
+    out = RAW_DIR/f"{ticker}.csv"
+    out.parent.mkdir(parents=True,exist_ok=True)
+    data.to_csv(out)
+
+def batch():
+    tickers = pd.read_csv(TICKER_FILE,header=None)[0].tolist()
+    for t in tickers:
+        print('↓',t)
+        download(t.strip())
+
+if __name__ == "__main__":
+    batch()
