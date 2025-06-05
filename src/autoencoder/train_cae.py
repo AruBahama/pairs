@@ -23,7 +23,6 @@ def train_cae():
         lengths.append(len(w))
         idx += len(df)
     Xw = np.concatenate(windows, axis=0)
-    Xw = Xw[...,np.newaxis]  # add channel dim
 
     model, encoder = build_cae(n_features)
     LOG_DIR.mkdir(parents=True, exist_ok=True)
