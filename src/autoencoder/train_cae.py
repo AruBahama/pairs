@@ -1,6 +1,7 @@
 import json
 import numpy as np
 import pandas as pd
+from sklearn.cluster import KMeans
 from ..config import PROC_DIR, CAE_EPOCHS, CAE_BATCH_SIZE, LOG_DIR, WINDOW_LENGTH, LATENT_DIM
 from .cae_model import build_cae
 from ..data.window_builder import build_windows
@@ -17,6 +18,7 @@ def train_cae(
     latent_dim: int = LATENT_DIM,
     save: bool = True,
     recency_alpha: float = 0.9,
+    agg_method: str = "centroids",
 ):
     """Train the CAE and return latent representations.
 
@@ -31,14 +33,20 @@ def train_cae(
     recency_alpha : float
         Exponential decay factor for recency weighting. Values closer to 1 give
         more emphasis to recent windows.
+    agg_method : {"centroids", "mean_var"}
+        Method for aggregating each ticker's window embeddings. ``"centroids"``
+        runs :class:`~sklearn.cluster.KMeans` with ``n_clusters=2`` and flattens
+        the resulting cluster centers. ``"mean_var"`` computes the weighted mean
+        and variance using ``recency_alpha``.
 
     Returns
     -------
     list[np.ndarray]
         Window level latent vectors for each ticker.
     np.ndarray
-        Array of shape ``(n_tickers, latent_dim * 2)`` containing the weighted
-        mean and variance for each ticker.
+        Array of shape ``(n_tickers, latent_dim * 2)``. If ``agg_method`` is
+        ``"centroids"``, this contains the flattened cluster centers for each
+        ticker. Otherwise, it holds the weighted mean and variance.
     History
         Training history returned by ``model.fit``.
     """
@@ -87,10 +95,15 @@ def train_cae(
     for l in lengths:
         lw = latent[start : start + l]
         ticker_windows_latent.append(lw)
-        weights = _exp_weights(l, recency_alpha)
-        mean = np.average(lw, axis=0, weights=weights)
-        var = np.average((lw - mean) ** 2, axis=0, weights=weights)
-        agg.append(np.concatenate([mean, var]))
+        if agg_method == "centroids" and l >= 2:
+            kmeans = KMeans(n_clusters=2, n_init=10)
+            kmeans.fit(lw)
+            agg.append(kmeans.cluster_centers_.ravel())
+        else:
+            weights = _exp_weights(l, recency_alpha)
+            mean = np.average(lw, axis=0, weights=weights)
+            var = np.average((lw - mean) ** 2, axis=0, weights=weights)
+            agg.append(np.concatenate([mean, var]))
         start += l
     ticker_latent = np.stack(agg, axis=0)
     if save:
