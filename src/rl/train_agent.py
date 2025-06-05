@@ -11,7 +11,7 @@ import logging
 from ray.rllib.algorithms.ppo import PPO
 
 from .envs import PairTradingEnv
-from ..config import LOG_DIR, PROC_DIR, NUM_WORKERS, SWITCH_PENALTY
+from ..config import LOG_DIR, PROC_DIR, NUM_WORKERS
 
 logging.basicConfig(format="%(asctime)s %(levelname)s:%(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -35,7 +35,8 @@ def _train_pair(t1: str, t2: str) -> None:
     """Train a PPO agent for a single pair of tickers."""
 
     env_cls = lambda cfg: PairTradingEnv(
-        _load_prices(t1), _load_prices(t2), SWITCH_PENALTY
+        _load_prices(t1),
+        _load_prices(t2),
     )
     trainer = PPO(
         env=env_cls,
