@@ -23,7 +23,7 @@ python scripts/run_full_pipeline.py
 2. **Pre‑processing** → technical indicators + scaling + 60‑day windows  
 3. **CAE training** (TensorFlow/Keras, 500 epochs) → 10‑D latent factors  
 4. **Clustering** (Ward, k=10) → pick 15 closest pairs/cluster  
-5. **RL training** (PPO) – *reward = ΔPnL*  
+5. **RL training** (PPO) – *reward = ΔPnL*, with a small penalty for switching directly from long to short (or vice versa)
 6. **Backtest** → PnL, annual %, beta, alpha, MDD, Sharpe, Sortino, Calmar  
 
 All notebooks under `/notebooks` are executable in order and call the production code in `src/`.

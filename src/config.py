@@ -24,6 +24,7 @@ PAIRS_PER_CLUST = 15
 
 INIT_CAPITAL    = 1_000
 RL_ALGO         = "PPO"
+SWITCH_PENALTY  = 0.1
 
 TRADE_FREQUENCY = "1D"
 METRICS = ["total_pnl","annual_return","beta","alpha","max_drawdown","sharpe","sortino","calmar"]
