@@ -29,9 +29,9 @@ python scripts/run_full_pipeline.py
    PPO (``gamma=0.99``).
 7. **Backtest results** with `src.backtest.backtester.run_backtests`.
 
-The RL agent training and backtesting steps currently contain placeholder
-implementations and are intended as starting points for further development.
-Backtesting metrics in `src.backtest.metrics` are likewise stubs awaiting full
-implementation.
+The RL training script uses a lightweight configuration suitable for quick
+experiments. Backtests leverage **Backtesting.py** via
+`src.backtest.backtester.run_backtests`, and a collection of common financial
+metrics is provided in `src.backtest.metrics`.
 
 ---
