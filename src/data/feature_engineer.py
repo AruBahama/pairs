@@ -1,4 +1,3 @@
-
 """Technical indicators + fundamentals"""
 import pandas as pd, pandas_ta as ta
 from financetoolkit import Toolkit
