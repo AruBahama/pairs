@@ -5,7 +5,7 @@ from sklearn.cluster import KMeans
 from ..config import PROC_DIR, CAE_EPOCHS, CAE_BATCH_SIZE, LOG_DIR, WINDOW_LENGTH, LATENT_DIM
 from .cae_model import build_cae
 from ..data.window_builder import build_windows
-from ..data.scaler import fit_scaler
+from ..data.scaler import load_scaler
 
 
 def _exp_weights(n: int, alpha: float) -> np.ndarray:
@@ -53,7 +53,7 @@ def train_cae(
     History
         Training history returned by ``model.fit``.
     """
-    scaler = fit_scaler()
+    scaler = load_scaler()
     files = sorted(PROC_DIR.glob("*.parquet"))
     dfs = [pd.read_parquet(p) for p in files]
     X = pd.concat(dfs).dropna()
