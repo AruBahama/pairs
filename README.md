@@ -25,6 +25,8 @@ python scripts/run_full_pipeline.py
 4. **Cluster securities** using `src.clustering.cluster_utils.cluster_latents`.
 5. **Select pairs** with `src.clustering.select_pairs.select_pairs` from each cluster.
 6. **Train agents** on each pair through `src.rl.train_agent.train_all_pairs`.
+   Alternatively run `scripts/train_agents_sb3.py` to use Stable-Baselines3
+   PPO (``gamma=0.99``).
 7. **Backtest results** with `src.backtest.backtester.run_backtests`.
 
 The RL agent training and backtesting steps currently contain placeholder
