@@ -1,7 +1,6 @@
 
-import numpy as np, json
+import numpy as np
 from sklearn.cluster import AgglomerativeClustering
-from scipy.spatial.distance import cdist
 from ..config import N_CLUSTERS, LOG_DIR
 
 def cluster_latents():

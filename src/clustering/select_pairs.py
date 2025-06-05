@@ -1,5 +1,5 @@
 
-import numpy as np, json, itertools
+import numpy as np
 from scipy.spatial.distance import cdist
 from ..config import PAIRS_PER_CLUST, LOG_DIR
 

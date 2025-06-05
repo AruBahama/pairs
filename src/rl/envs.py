@@ -20,13 +20,14 @@ class PairTradingEnv(gym.Env):
 
     def step(self, action):
         prev_spread = self.spread[self.t-1]
-        self.position = {0:0,1:1,2:-1}[action]
+        prev_position = self.position
         self.t += 1
         done = self.t >= len(self.spread)
         obs = self.spread[self.t-WINDOW_LENGTH:self.t]
-        pnl = self.position * (self.spread[self.t-1] - prev_spread)
-        reward = pnl  # ΔPnL as reward
-        info={'pnl':pnl}
+        pnl = prev_position * (self.spread[self.t-1] - prev_spread)
+        reward = pnl
+        self.position = {0:0,1:1,2:-1}[action]
+        info = {'pnl': pnl}
         return obs.astype(np.float32), reward, done, False, info
 
     def reset(self, seed=None, options=None):
