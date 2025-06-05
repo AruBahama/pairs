@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pairs-Trading Pipeline</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+<h2>Data and ML Flow</h2>
+<div class="mermaid">
+  graph TD
+    A[Download Data] --> B[Feature Engineering]
+    B --> C[Train CAE]
+    C --> D[Cluster Latents]
+    D --> E[Select Pairs]
+    E --> F[Train RL Agents]
+    F --> G[Backtest Results]
+</div>
+<script>
+mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>
