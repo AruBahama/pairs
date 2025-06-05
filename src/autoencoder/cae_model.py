@@ -1,6 +1,7 @@
 
 import tensorflow as tf
 from tensorflow.keras import layers, Model
+import numpy as np
 from ..config import WINDOW_LENGTH, LATENT_DIM
 
 def build_cae(n_features:int):

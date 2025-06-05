@@ -1,7 +1,7 @@
 
-import numpy as np, pandas as pd, joblib
-import tensorflow as tf
-from ..config import PROC_DIR, CAE_EPOCHS, LATENT_DIM, LOG_DIR
+import numpy as np
+import pandas as pd
+from ..config import PROC_DIR, CAE_EPOCHS, CAE_BATCH_SIZE, LOG_DIR
 from .cae_model import build_cae
 from ..data.window_builder import build_windows
 from ..data.scaler import fit_scaler
@@ -22,7 +22,8 @@ def train_cae():
     Xw = Xw[...,np.newaxis]  # add channel dim
 
     model, encoder = build_cae(n_features)
-    history = model.fit(Xw, Xw, epochs=CAE_EPOCHS, batch_size=256, validation_split=0.1)
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+    history = model.fit(Xw, Xw, epochs=CAE_EPOCHS, batch_size=CAE_BATCH_SIZE, validation_split=0.1)
     model.save(LOG_DIR/'cae.h5')
     encoder.save(LOG_DIR/'encoder.h5')
     np.save(LOG_DIR/'latent.npy', encoder.predict(Xw))

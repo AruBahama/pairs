@@ -6,8 +6,8 @@ from ..config import RAW_DIR, PROC_DIR
 
 def engineer(ticker:str):
     df = pd.read_csv(RAW_DIR/f"{ticker}.csv",index_col=0,parse_dates=True)
-    df_ta = ta.strategy(ta.Strategy(name='all',talib=False),df.copy())
-    df = pd.concat([df, df_ta], axis=1).dropna()
+    df.ta.strategy(ta.Strategy(name="all", talib=False))
+    df = df.dropna()
     tk = Toolkit(
         ticker,
         start=df.index.min(),
