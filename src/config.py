@@ -9,7 +9,8 @@ RAW_DIR         = DATA_DIR / "raw"
 PROC_DIR        = DATA_DIR / "processed"
 LOG_DIR         = ROOT_DIR / "logs"
 
-TICKER_FILE     = DATA_DIR / "snp.csv"
+# CSV listing tickers to download. Only the first column is used.
+TICKER_FILE     = ROOT_DIR / "snp.csv"
 START_DATE      = "2015-01-01"
 END_DATE        = "2024-12-31"
 
