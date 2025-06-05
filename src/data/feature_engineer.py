@@ -5,16 +5,20 @@ from financetoolkit import Toolkit
 from ..config import RAW_DIR, PROC_DIR
 
 def engineer(ticker:str):
-    df = pd.read_csv(RAW_DIR/f"{ticker}.csv",index_col=0,parse_dates=True)
+    df = pd.read_csv(RAW_DIR/f"{ticker}.csv", index_col=0, parse_dates=True)
     df.ta.strategy(ta.Strategy(name="all", talib=False))
     df = df.dropna()
+
     tk = Toolkit(
-        ticker,
+        [ticker],  # FinanceToolkit expects a list
         start=df.index.min(),
         end=df.index.max(),
         enforce_source="YahooFinance",
     )
-    funda = tk.ratios.collect().ffill().reindex(df.index)
+
+    funda = tk.ratios.collect().ffill()
+
+    df = df.reindex(funda.index).ffill()
     df = pd.concat([df, funda], axis=1).dropna()
     out = PROC_DIR/f"{ticker}.parquet"
     out.parent.mkdir(parents=True,exist_ok=True)

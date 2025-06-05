@@ -1,19 +1,19 @@
 
-"""Download OHLCV and align to quarter‑end."""
+"""Download daily OHLCV data."""
 import pandas as pd, yfinance as yf
 from pathlib import Path
 from ..config import RAW_DIR, START_DATE, END_DATE, TICKER_FILE
 
-def align_to_quarter_end(df):
-    df = df.resample("B").ffill()
-    return df.loc[df.index.isin(df.resample("Q").last().index)]
+def _fill_missing_days(df: pd.DataFrame) -> pd.DataFrame:
+    """Ensure continuous business-day index for later alignment."""
+    return df.resample("B").ffill()
 
 def download(ticker:str):
-    data = yf.download(ticker,start=START_DATE,end=END_DATE,progress=False)
+    data = yf.download(ticker, start=START_DATE, end=END_DATE, progress=False)
     if data.empty:
         print(f"No data for {ticker}")
         return
-    data = align_to_quarter_end(data)
+    data = _fill_missing_days(data)
     out = RAW_DIR/f"{ticker}.csv"
     out.parent.mkdir(parents=True,exist_ok=True)
     data.to_csv(out)

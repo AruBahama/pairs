@@ -19,7 +19,7 @@ python scripts/run_full_pipeline.py
 
 ## Pipeline Overview
 
-1. **Data collection** → daily OHLCV + fundamentals (FinanceToolkit) aligned to quarter‑ends  
+1. **Data collection** → daily OHLCV + fundamentals (FinanceToolkit) aligned to fiscal quarter‑ends
 2. **Pre‑processing** → technical indicators + scaling + 60‑day windows  
 3. **CAE training** (TensorFlow/Keras, 500 epochs) → 10‑D latent factors  
 4. **Clustering** (Ward, k=10) → pick 15 closest pairs/cluster  
