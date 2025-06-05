@@ -1,3 +1,4 @@
+"""Financial metrics utilities."""
 
 def sharpe(returns, rf=0):
     """Sharpe ratio of a returns series."""
@@ -28,7 +29,7 @@ def beta(returns, benchmark):
     return cov[0, 1] / cov[1, 1]
 
 
-def alpha(returns, benchmark):
+def alpha(returns, benchmark, rf=0):
     """Alpha of the strategy after adjusting for beta."""
     import numpy as np
     b = beta(returns, benchmark)
@@ -62,4 +63,3 @@ def calmar(returns, periods_per_year=252):
     if dd == 0:
         return float('inf')
     return ar / dd
-
