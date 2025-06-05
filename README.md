@@ -10,6 +10,7 @@ git clone <your‑fork> pairs
 cd pairs
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+python scripts/optimize_hyperparams.py  # optional hyperparameter tuning
 python scripts/run_full_pipeline.py
 ```
 ### Repository layout
@@ -20,11 +21,12 @@ python scripts/run_full_pipeline.py
 ## Pipeline Overview
 
 1. **Data collection** → daily OHLCV + fundamentals (FinanceToolkit) aligned to fiscal quarter‑ends
-2. **Pre‑processing** → technical indicators + scaling + 60‑day windows  
-3. **CAE training** (TensorFlow/Keras, 500 epochs) → 10‑D latent factors  
-4. **Clustering** (Ward, k=10) → pick 15 closest pairs/cluster  
-5. **RL training** (PPO) – *reward = ΔPnL*  
-6. **Backtest** → PnL, annual %, beta, alpha, MDD, Sharpe, Sortino, Calmar  
+2. **Pre‑processing** → technical indicators + scaling + 60‑day windows
+3. **Hyperparameter search** (Optuna) → optimal window length, latent dimension and cluster count
+4. **CAE training** (TensorFlow/Keras, 500 epochs) → 10‑D latent factors
+5. **Clustering** (Ward, k=10) → pick 15 closest pairs/cluster
+6. **RL training** (PPO) – *reward = ΔPnL*
+7. **Backtest** → PnL, annual %, beta, alpha, MDD, Sharpe, Sortino, Calmar
 
 All notebooks under `/notebooks` are executable in order and call the production code in `src/`.
 

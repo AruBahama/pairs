@@ -2,12 +2,13 @@
 import json
 import numpy as np
 import pandas as pd
-from ..config import PROC_DIR, CAE_EPOCHS, CAE_BATCH_SIZE, LOG_DIR
+from ..config import PROC_DIR, CAE_EPOCHS, CAE_BATCH_SIZE, LOG_DIR, WINDOW_LENGTH, LATENT_DIM
 from .cae_model import build_cae
 from ..data.window_builder import build_windows
 from ..data.scaler import fit_scaler
 
-def train_cae():
+def train_cae(window_length: int = WINDOW_LENGTH, latent_dim: int = LATENT_DIM, save: bool = True):
+    """Train the CAE and return latent representations."""
     scaler = fit_scaler()
     files = sorted(PROC_DIR.glob("*.parquet"))
     dfs = [pd.read_parquet(p) for p in files]
@@ -18,14 +19,14 @@ def train_cae():
     lengths = []
     idx = 0
     for df in dfs:
-        w = build_windows(pd.DataFrame(X[idx:idx + len(df)], index=df.index))
+        w = build_windows(pd.DataFrame(X[idx:idx + len(df)], index=df.index), window_length)
         windows.append(w)
         lengths.append(len(w))
         idx += len(df)
     Xw = np.concatenate(windows, axis=0)
     Xw = Xw[...,np.newaxis]  # add channel dim
 
-    model, encoder = build_cae(n_features)
+    model, encoder = build_cae(n_features, window_length, latent_dim)
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     history = model.fit(
         Xw,
@@ -34,11 +35,13 @@ def train_cae():
         batch_size=CAE_BATCH_SIZE,
         validation_split=0.1,
     )
-    model.save(LOG_DIR / "cae.h5")
-    encoder.save(LOG_DIR / "encoder.h5")
+    if save:
+        model.save(LOG_DIR / "cae.h5")
+        encoder.save(LOG_DIR / "encoder.h5")
 
     latent = encoder.predict(Xw)
-    np.save(LOG_DIR / "latent.npy", latent)
+    if save:
+        np.save(LOG_DIR / "latent.npy", latent)
 
     # Aggregate latent vectors per ticker to obtain one vector per stock
     start = 0
@@ -47,10 +50,12 @@ def train_cae():
         agg.append(latent[start : start + l].mean(axis=0))
         start += l
     ticker_latent = np.stack(agg, axis=0)
-    np.save(LOG_DIR / "ticker_latent.npy", ticker_latent)
+    if save:
+        np.save(LOG_DIR / "ticker_latent.npy", ticker_latent)
 
     tickers = [p.stem for p in files]
-    with open(LOG_DIR / "ticker_index.json", "w") as f:
-        json.dump(tickers, f)
+    if save:
+        with open(LOG_DIR / "ticker_index.json", "w") as f:
+            json.dump(tickers, f)
 
-    return history
+    return latent, ticker_latent, history
