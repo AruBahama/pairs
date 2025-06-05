@@ -3,16 +3,21 @@
 
 End‑to‑end research pipeline that discovers statistical‑arbitrage pairs in the S&P 500, clusters them with a convolutional auto‑encoder (CAE), and trains a PPO agent (Ray RLlib) to trade each pair with **$1 000** initial capital.
 
-## Quick start
+## Quick Start
+
+Clone the repository, install the Python dependencies and run the pipeline:
 
 ```bash
-git clone <your‑fork> pairs
+git clone <your-fork> pairs
 cd pairs
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python scripts/optimize_hyperparams.py  # optional hyperparameter tuning
 python scripts/run_full_pipeline.py
 ```
+
+This single command downloads data, trains the ML models and runs a
+backtest. A Mermaid diagram describing how each module connects is available in
+[docs/pipeline_flow.html](docs/pipeline_flow.html).
 ### Repository layout
 - `src/` – production Python package with submodules for data, autoencoder, clustering, RL and backtesting
 - `scripts/` – entry points and utilities
