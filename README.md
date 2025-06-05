@@ -29,5 +29,7 @@ python scripts/run_full_pipeline.py
 
 The RL agent training and backtesting steps currently contain placeholder
 implementations and are intended as starting points for further development.
+Backtesting metrics in `src.backtest.metrics` are likewise stubs awaiting full
+implementation.
 
 ---
