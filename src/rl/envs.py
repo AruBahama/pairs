@@ -2,7 +2,7 @@
 import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
-from ..config import INIT_CAPITAL, WINDOW_LENGTH
+from ..config import INIT_CAPITAL, WINDOW_LENGTH, SWITCH_PENALTY
 
 class PairTradingEnv(gym.Env):
     """Simple PnL reward: Δ(PnL) given discrete actions."""
@@ -26,7 +26,10 @@ class PairTradingEnv(gym.Env):
         obs = self.spread[self.t-WINDOW_LENGTH:self.t]
         pnl = prev_position * (self.spread[self.t-1] - prev_spread)
         reward = pnl
-        self.position = {0:0,1:1,2:-1}[action]
+        new_position = {0:0,1:1,2:-1}[action]
+        if prev_position * new_position == -1:
+            reward -= SWITCH_PENALTY
+        self.position = new_position
         info = {'pnl': pnl}
         return obs.astype(np.float32), reward, done, False, info
 

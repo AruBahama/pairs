@@ -21,13 +21,6 @@ python scripts/run_full_pipeline.py
 ## Pipeline Overview
 
 1. **Data collection** → daily OHLCV + fundamentals (FinanceToolkit) aligned to fiscal quarter‑ends
-2. **Pre‑processing** → technical indicators + scaling + 60‑day windows
-3. **Hyperparameter search** (Optuna) → optimal window length, latent dimension and cluster count
-4. **CAE training** (TensorFlow/Keras, 500 epochs) → 10‑D latent factors
-5. **Clustering** (Ward, k=10) → pick 15 closest pairs/cluster
-6. **RL training** (PPO) – *reward = ΔPnL*
-7. **Backtest** → PnL, annual %, beta, alpha, MDD, Sharpe, Sortino, Calmar
-
 All notebooks under `/notebooks` are executable in order and call the production code in `src/`.
 
 ---
