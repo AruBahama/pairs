@@ -2,6 +2,7 @@ import json
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
 from ..config import PROC_DIR, CAE_EPOCHS, CAE_BATCH_SIZE, LOG_DIR, WINDOW_LENGTH, LATENT_DIM
 from .cae_model import build_cae
 from ..data.window_builder import build_windows
@@ -55,22 +56,19 @@ def train_cae(
     """
     scaler = load_scaler()
     files = sorted(PROC_DIR.glob("*.parquet"))
-    dfs = [pd.read_parquet(p) for p in files]
-    X = pd.concat(dfs).dropna()
-    X = scaler.transform(X)
-    n_features = X.shape[1]
-
     windows = []
     lengths = []
-    idx = 0
-    for df in dfs:
+    for p in files:
+        df = pd.read_parquet(p)
+        df = df.dropna()
+        scaled = scaler.transform(df)
         w = build_windows(
-            pd.DataFrame(X[idx: idx + len(df)], index=df.index),
-            window_length
+            pd.DataFrame(scaled, index=df.index),
+            window_length,
         )
         windows.append(w)
         lengths.append(len(w))
-        idx += len(df)
+    n_features = scaler.mean_.shape[0]
     Xw = np.concatenate(windows, axis=0)
 
     model, encoder = build_cae(n_features, window_length, latent_dim)
@@ -110,8 +108,10 @@ def train_cae(
             agg.append(np.concatenate([mean, var]))
         start += l
     ticker_latent = np.stack(agg, axis=0)
+    ticker_latent_scaled = StandardScaler().fit_transform(ticker_latent)
     if save:
         np.save(LOG_DIR / "ticker_latent.npy", ticker_latent)
+        np.save(LOG_DIR / "ticker_latent_scaled.npy", ticker_latent_scaled)
 
     tickers = [p.stem for p in files]
     if save:
