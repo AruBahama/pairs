@@ -4,4 +4,14 @@
 # backtesting logic should go.
 
 def run_backtests():
-    print("Backtest placeholder – implement later.")
+    """Run offline backtests for trained policies.
+
+    Expected arguments for future implementation
+    --------------------------------------------
+    policy_dir : str
+        Directory containing saved RL policy checkpoints.
+    pair_list : list[str]
+        List of trading pairs to evaluate.
+    """
+
+    raise NotImplementedError("Backtesting engine not implemented yet")
