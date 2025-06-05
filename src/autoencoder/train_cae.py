@@ -8,6 +8,7 @@ from ..data.window_builder import build_windows
 from ..data.scaler import fit_scaler
 
 def train_cae():
+    """Train the convolutional autoencoder and save latent factors."""
     scaler = fit_scaler()
     files = sorted(PROC_DIR.glob("*.parquet"))
     dfs = [pd.read_parquet(p) for p in files]
