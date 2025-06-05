@@ -7,11 +7,14 @@ from typing import Iterable
 import numpy as np
 import pandas as pd
 import ray
-from ray.tune.registry import register_env
-from ray.rllib.algorithms.ppo import PPOConfig
+import logging
+from ray.rllib.algorithms.ppo import PPO
 
 from .envs import PairTradingEnv
-from ..config import LOG_DIR, PROC_DIR, NUM_WORKERS
+from ..config import LOG_DIR, PROC_DIR, NUM_WORKERS, SWITCH_PENALTY
+
+logging.basicConfig(format="%(asctime)s %(levelname)s:%(message)s", level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def _load_prices(ticker: str) -> pd.Series:
@@ -31,28 +34,24 @@ def _load_prices(ticker: str) -> pd.Series:
 def _train_pair(t1: str, t2: str) -> None:
     """Train a PPO agent for a single pair of tickers."""
 
-    price1 = _load_prices(t1)
-    price2 = _load_prices(t2)
-    env_id = f"PairTradingEnv_{t1}_{t2}"
-
-    def env_creator(env_config=None):
-        return PairTradingEnv(price1, price2)
-
-    register_env(env_id, env_creator)
-    config = (
-        PPOConfig()
-        .environment(env_id)
-        .framework("tf2")
-        .rollouts(num_rollout_workers=NUM_WORKERS)
+    env_cls = lambda cfg: PairTradingEnv(
+        _load_prices(t1), _load_prices(t2), SWITCH_PENALTY
     )
-    algo = config.build()
-    for _ in range(10):
-        algo.train()
+    trainer = PPO(
+        env=env_cls,
+        config={
+            "framework": "torch",
+            "num_workers": NUM_WORKERS,
+            "train_batch_size": 4000,
+        },
+    )
 
-    ckpt_dir = Path(LOG_DIR) / f"ppo_{t1}_{t2}"
-    ckpt_dir.mkdir(parents=True, exist_ok=True)
-    algo.save(str(ckpt_dir))
-    algo.stop()
+    for _ in range(10):
+        result = trainer.train()
+        logger.info(f"{t1}-{t2}: {result['episode_reward_mean']}")
+
+    checkpoint = trainer.save(LOG_DIR / f"{t1}_{t2}")
+    trainer.cleanup()
 
 
 def train_all_pairs(pairs: Iterable[tuple[str, str]] | None = None) -> None:
@@ -71,7 +70,7 @@ def train_all_pairs(pairs: Iterable[tuple[str, str]] | None = None) -> None:
         pairs = np.load(pairs_file, allow_pickle=True)
 
     for t1, t2 in pairs:
-        print(f"Training pair {t1}-{t2}")
+        logger.info(f"Training pair {t1}-{t2}")
         _train_pair(t1, t2)
 
     ray.shutdown()
