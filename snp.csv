@@ -1,6 +1,6 @@
 Ticker,
-OMC,Advertising
-IPG,Advertising
+OMC,
+IPG,
 GD,
 NOC,
 HII,
@@ -11,15 +11,15 @@ RTX,
 HWM,
 GE,
 TDG,
-DE,Agricultural & Farm Machinery
-ADM,Agricultural Products & Services
-BG,Agricultural Products & Services
+DE,
+ADM,
+BG,
 FDX,
 UPS,
 CHRW,
 EXPD,
-TJX,Apparel Retail
-ROST,Apparel Retail
+TJX,
+ROST,
 TPR,
 LULU,
 NKE,
@@ -50,7 +50,7 @@ KKR,
 GM,
 F,
 TSLA,
-APTV,Automotive Parts & Equipment
+APTV,
 AZO,
 ORLY,
 KMX,
@@ -60,11 +60,11 @@ GILD,
 AMGN,
 ABBV,
 INCY,
-TAP,Brewers
-FOXA,Broadcasting
-FOX,Broadcasting
-EBAY,Broadline Retail
-AMZN,Broadline Retail
+TAP,
+FOXA,
+FOX,
+EBAY,
+AMZN,
 CARR,
 MAS,
 AOS,
@@ -73,29 +73,29 @@ ALLE,
 JCI,
 LII,
 TT,
-CHTR,Cable & Satellite
-CMCSA,Cable & Satellite
-JBHT,Cargo Ground Transportation
-ODFL,Cargo Ground Transportation
+CHTR,
+CMCSA,
+JBHT,
+ODFL,
 MGM,
 LVS,
 WYNN,
-DOW,Commodity Chemicals
+DOW,
 CSCO,
 FFIV,
 JNPR,
 MSI,
 ANET,
-BBY,Computer & Electronics Retail
-J,Construction & Engineering
-PWR,Construction & Engineering
+BBY,
+J,
+PWR,
 PCAR,
 CAT,
 CMI,
 WAB,
-MLM,Construction Materials
-VMC,Construction Materials
-GRMN,Consumer Electronics
+MLM,
+VMC,
+GRMN,
 COF,
 AXP,
 SYF,
@@ -104,11 +104,11 @@ DLTR,
 TGT,
 WMT,
 COST,
-FCX,Copper
-DLR,Data Center REITs
-EQIX,Data Center REITs
-BR,Data Processing & Outsourced Services
-BF.B,Distillers & Vintners
+FCX,
+DLR,
+EQIX,
+BR,
+BF.B,
 LKQ,
 GPC,
 POOL,
@@ -142,15 +142,15 @@ AME,
 ETN,
 EMR,
 ROK,
-APH,Electronic Components
-GLW,Electronic Components
+APH,
+GLW,
 TRMB,
 TDY,
 ZBRA,
 KEYS,
 ROP,
-TEL,Electronic Manufacturing Services
-JBL,Electronic Manufacturing Services
+TEL,
+JBL,
 WM,
 RSG,
 ROL,
@@ -166,11 +166,11 @@ MCO,
 SPGI,
 MSCI,
 COIN,
-SYY,Food Distributors
-KR,Food Retail
-DECK,Footwear
-ATO,Gas Utilities
-NEM,Gold
+SYY,
+KR,
+DECK,
+ATO,
+NEM,
 CAH,
 COR,
 HSIC,
@@ -190,8 +190,8 @@ PODD,
 IDXX,
 ISRG,
 DXCM,
-HCA,Health Care Facilities
-UHS,Health Care Facilities
+HCA,
+UHS,
 WELL,
 VTR,
 DOC,
@@ -203,16 +203,16 @@ LH,
 ALGN,
 WST,
 COO,
-MHK,Home Furnishings
-LOW,Home Improvement Retail
-HD,Home Improvement Retail
+MHK,
+LOW,
+HD,
 NVR,
 DHI,
 LEN,
 PHM,
-WSM,Homefurnishing Retail
-VICI,Hotel & Resort REITs
-HST,Hotel & Resort REITs
+WSM,
+VICI,
+HST,
 CCL,
 EXPE,
 NCLH,
@@ -228,12 +228,12 @@ CHD,
 ADP,
 PAYX,
 PAYC,
-AES,Independent Power Producers & Energy Traders
-NRG,Independent Power Producers & Energy Traders
-MMM,Industrial Conglomerates
-HON,Industrial Conglomerates
-LIN,Industrial Gases
-APD,Industrial Gases
+AES,
+NRG,
+MMM,
+HON,
+LIN,
+APD,
 SNA,
 DOV,
 HUBB,
@@ -248,7 +248,7 @@ XYL,
 PNR,
 SWK,
 IR,
-PLD,Industrial REITs
+PLD,
 MMC,
 AON,
 BRO,
@@ -257,9 +257,9 @@ ERIE,
 CVX,
 XOM,
 HES,
-T,Integrated Telecommunication Services
-VZ,Integrated Telecommunication Services
-EA,Interactive Home Entertainment
+T,
+VZ,
+EA,
 GOOGL,
 GOOG,
 MTCH,
@@ -276,7 +276,7 @@ IBM,
 ACN,
 IT,
 EPAM,
-HAS,Leisure Products
+HAS,
 AFL,
 MET,
 PFG,
@@ -293,7 +293,7 @@ MOH,
 HUM,
 UNH,
 CNC,
-BALL,"Metal, Glass & Plastic Containers"
+BALL,
 DIS,
 TKO,
 NFLX,
@@ -304,9 +304,9 @@ EQR,
 ESS,
 CPT,
 UDR,
-L,Multi-line Insurance
-AIZ,Multi-line Insurance
-BRK.B,Multi-Sector Holdings
+L,
+AIZ,
+BRK.B,
 DTE,
 ED,
 PCG,
@@ -319,7 +319,7 @@ CMS,
 D,
 CNP,
 NEE,
-ARE,Office REITs
+ARE,
 BKR,
 SLB,
 HAL,
@@ -339,9 +339,9 @@ OKE,
 KMI,
 WMB,
 TRGP,
-IRM,Other Specialized REITs
-ULTA,Other Specialty Retail
-TSCO,Other Specialty Retail
+IRM,
+ULTA,
+TSCO,
 GIS,
 KHC,
 K,
@@ -360,8 +360,8 @@ IP,
 DAL,
 UAL,
 LUV,
-UBER,Passenger Ground Transportation
-PG,Personal Care Products
+UBER,
+PG,
 JNJ,
 PFE,
 BMY,
@@ -375,21 +375,21 @@ CINF,
 HIG,
 TRV,
 ACGL,
-NWSA,Publishing
-NWS,Publishing
+NWSA,
+NWS,
 CSX,
 NSC,
 UNP,
-CSGP,Real Estate Services
-CBRE,Real Estate Services
+CSGP,
+CBRE,
 FITB,
 HBAN,
 MTB,
 RF,
 CFG,
-EG,Reinsurance
-VRSK,Research & Consulting Services
-EFX,Research & Consulting Services
+EG,
+VRSK,
+EFX,
 DRI,
 MCD,
 YUM,
@@ -401,8 +401,8 @@ FRT,
 KIM,
 O,
 REG,
-PSA,Self-Storage REITs
-EXR,Self-Storage REITs
+PSA,
+EXR,
 AMAT,
 LRCX,
 TER,
@@ -420,25 +420,25 @@ SWKS,
 ON,
 AMD,
 NVDA,
-INVH,Single-Family Residential REITs
+INVH,
 PEP,
 KO,
 KDP,
 MNST,
-DASH,Specialized Consumer Services
+DASH,
 LYB,
 EMN,
 PPG,
 SHW,
 ECL,
-STLD,Steel
-NUE,Steel
+STLD,
+NUE,
 GEN,
 MSFT,
 NOW,
 FTNT,
 PANW,
-CDW,Technology Distributors
+CDW,
 STX,
 HPQ,
 NTAP,
@@ -446,13 +446,13 @@ WDC,
 HPE,
 AAPL,
 SMCI,
-SBAC,Telecom Tower REITs
-AMT,Telecom Tower REITs
-WY,Timber REITs
-MO,Tobacco
-PM,Tobacco
-URI,Trading Companies & Distributors
-FAST,Trading Companies & Distributors
+SBAC,
+AMT,
+WY,
+MO,
+PM,
+URI,
+FAST,
 GPN,
 PYPL,
 CPAY,
@@ -461,5 +461,5 @@ FI,
 V,
 MA,
 FIS,
-AWK,Water Utilities
-TMUS,Wireless Telecommunication Services
+AWK,
+TMUS,
