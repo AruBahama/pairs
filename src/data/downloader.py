@@ -19,7 +19,14 @@ def download(ticker:str):
     data.to_csv(out)
 
 def batch():
-    tickers = pd.read_csv(TICKER_FILE,header=None)[0].tolist()
+    # The snp.csv file may contain additional columns; only the first column
+    # with ticker symbols should be used.
+    tickers = (
+        pd.read_csv(TICKER_FILE, usecols=[0])
+          .iloc[:, 0]
+          .dropna()
+          .tolist()
+    )
     for t in tickers:
         print('↓',t)
         download(t.strip())
