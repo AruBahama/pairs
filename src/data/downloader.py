@@ -1,4 +1,3 @@
-
 """Download daily OHLCV data."""
 import pandas as pd, yfinance as yf
 from pathlib import Path
