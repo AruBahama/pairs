@@ -2,7 +2,7 @@
 
 import optuna
 import tensorflow as tf
-from sklearn.metrics import silhouette_score
+from sklearn.metrics import calinski_harabasz_score
 from src.autoencoder.train_cae import train_cae
 from src.clustering.cluster_utils import cluster_latents
 from src.config import LOG_DIR
@@ -21,7 +21,7 @@ def objective(trial: optuna.Trial) -> float:
             callbacks=[tf.keras.callbacks.EarlyStopping(patience=10, restore_best_weights=True)],
         )
         _, labels = cluster_latents(ticker_latent, n_clusters=n_clusters, save=False)
-        score = silhouette_score(ticker_latent, labels)
+        score = calinski_harabasz_score(ticker_latent, labels)
         return -float(score)
     except Exception as exc:
         print(f"Trial failed: {exc}")
