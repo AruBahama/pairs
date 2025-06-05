@@ -32,6 +32,35 @@ def _load_checkpoint(directory: Path) -> Algorithm:
     return Algorithm.from_checkpoint(str(candidates[0]))
 
 
+class RLPairStrategy(Strategy):
+    """Backtesting strategy that executes a trained RL policy."""
+
+    ckpt_dir: str | Path
+
+    def init(self) -> None:
+        self.agent = _load_checkpoint(Path(self.ckpt_dir))
+        self.state = self.agent.get_initial_state()
+
+    def next(self) -> None:
+        obs = self.data.Close[-WINDOW_LENGTH:].values.astype("float32")
+        action, self.state, _ = self.agent.compute_single_action(
+            obs, state=self.state
+        )
+        if action == 1:
+            if not self.position.is_long:
+                if self.position:
+                    self.position.close()
+                self.buy()
+        elif action == 2:
+            if not self.position.is_short:
+                if self.position:
+                    self.position.close()
+                self.sell()
+        else:
+            if self.position:
+                self.position.close()
+
+
 def run_backtests(
     policy_dir: str | Path | None = None,
     pair_list: Iterable[tuple[str, str]] | None = None,
@@ -60,58 +89,26 @@ def run_backtests(
 
     for t1, t2 in pair_list:
         pair_name = f"{t1}-{t2}"
-        ckpt_dir = policy_dir / f"ppo_{t1}_{t2}"
-        try:
-            algo = _load_checkpoint(ckpt_dir)
-        except Exception as e:
-            print(f"Skipping {pair_name}: {e}")
-            continue
 
         price1 = _load_prices(t1)
         price2 = _load_prices(t2)
-        spread = price1 - price2
-        df = pd.DataFrame(
+        df = pd.DataFrame({"spread": price1 - price2})
+        df_bt = pd.DataFrame(
             {
-                "Open": spread,
-                "High": spread,
-                "Low": spread,
-                "Close": spread,
+                "Open": df["spread"],
+                "High": df["spread"],
+                "Low": df["spread"],
+                "Close": df["spread"],
+                "Volume": 0,
             }
         )
 
-        class RLPairStrategy(Strategy):
-            def init(self):
-                self.t = WINDOW_LENGTH
-                self.state = algo.get_initial_state()
-
-            def next(self):
-                if self.t >= len(spread):
-                    return
-                obs = spread.iloc[self.t - WINDOW_LENGTH : self.t].values.astype(
-                    "float32"
-                )
-                action, self.state, _ = algo.compute_single_action(
-                    obs, state=self.state
-                )
-                if action == 1:  # long spread
-                    if not self.position.is_long:
-                        self.position.close()
-                        self.buy()
-                elif action == 2:  # short spread
-                    if not self.position.is_short:
-                        self.position.close()
-                        self.sell()
-                else:  # flat
-                    if self.position:
-                        self.position.close()
-                self.t += 1
-
         bt = Backtest(
-            df,
+            df_bt,
             RLPairStrategy,
             cash=INIT_CAPITAL,
             commission=0.0,
-            exclusive_orders=True,
+            strategy_kwargs={"ckpt_dir": LOG_DIR / f"{t1}_{t2}"},
         )
 
         stats = bt.run()
