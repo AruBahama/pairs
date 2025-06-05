@@ -2,10 +2,11 @@ import json
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
 from ..config import PROC_DIR, CAE_EPOCHS, CAE_BATCH_SIZE, LOG_DIR, WINDOW_LENGTH, LATENT_DIM
 from .cae_model import build_cae
 from ..data.window_builder import build_windows
-from ..data.scaler import fit_scaler
+from ..data.scaler import load_scaler
 
 
 def _exp_weights(n: int, alpha: float) -> np.ndarray:
@@ -19,6 +20,7 @@ def train_cae(
     save: bool = True,
     recency_alpha: float = 0.9,
     agg_method: str = "centroids",
+    callbacks: list | None = None,
 ):
     """Train the CAE and return latent representations.
 
@@ -38,6 +40,8 @@ def train_cae(
         runs :class:`~sklearn.cluster.KMeans` with ``n_clusters=2`` and flattens
         the resulting cluster centers. ``"mean_var"`` computes the weighted mean
         and variance using ``recency_alpha``.
+    callbacks : list, optional
+        List of Keras callbacks passed directly to ``model.fit``.
 
     Returns
     -------
@@ -50,24 +54,21 @@ def train_cae(
     History
         Training history returned by ``model.fit``.
     """
-    scaler = fit_scaler()
+    scaler = load_scaler()
     files = sorted(PROC_DIR.glob("*.parquet"))
-    dfs = [pd.read_parquet(p) for p in files]
-    X = pd.concat(dfs).dropna()
-    X = scaler.transform(X)
-    n_features = X.shape[1]
-
     windows = []
     lengths = []
-    idx = 0
-    for df in dfs:
+    for p in files:
+        df = pd.read_parquet(p)
+        df = df.dropna()
+        scaled = scaler.transform(df)
         w = build_windows(
-            pd.DataFrame(X[idx: idx + len(df)], index=df.index),
-            window_length
+            pd.DataFrame(scaled, index=df.index),
+            window_length,
         )
         windows.append(w)
         lengths.append(len(w))
-        idx += len(df)
+    n_features = scaler.mean_.shape[0]
     Xw = np.concatenate(windows, axis=0)
 
     model, encoder = build_cae(n_features, window_length, latent_dim)
@@ -78,6 +79,7 @@ def train_cae(
         epochs=CAE_EPOCHS,
         batch_size=CAE_BATCH_SIZE,
         validation_split=0.1,
+        callbacks=callbacks,
     )
 
     if save:
@@ -106,8 +108,10 @@ def train_cae(
             agg.append(np.concatenate([mean, var]))
         start += l
     ticker_latent = np.stack(agg, axis=0)
+    ticker_latent_scaled = StandardScaler().fit_transform(ticker_latent)
     if save:
         np.save(LOG_DIR / "ticker_latent.npy", ticker_latent)
+        np.save(LOG_DIR / "ticker_latent_scaled.npy", ticker_latent_scaled)
 
     tickers = [p.stem for p in files]
     if save:

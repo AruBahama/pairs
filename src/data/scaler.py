@@ -4,8 +4,23 @@ import joblib, pandas as pd
 from ..config import PROC_DIR, LOG_DIR
 
 def fit_scaler():
-    dfs = [pd.read_parquet(p) for p in PROC_DIR.glob("*.parquet")]
+    """Fit a :class:`StandardScaler` on all processed data."""
+    files = list(PROC_DIR.glob("*.parquet"))
+    if not files:
+        raise FileNotFoundError(
+            f"No processed parquet files found in {PROC_DIR}"
+        )
+    dfs = [pd.read_parquet(p) for p in files]
     X = pd.concat(dfs).dropna()
     scaler = StandardScaler().fit(X)
-    joblib.dump(scaler, LOG_DIR/'scaler.joblib')
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+    joblib.dump(scaler, LOG_DIR / "scaler.joblib")
     return scaler
+
+
+def load_scaler():
+    """Load the cached scaler or fit a new one if missing."""
+    path = LOG_DIR / "scaler.joblib"
+    if path.exists():
+        return joblib.load(path)
+    return fit_scaler()
