@@ -15,9 +15,12 @@ def engineer(ticker:str):
         enforce_source="YahooFinance",
     )
 
-    funda = tk.ratios.collect().ffill()
+    funda = tk.ratios.collect()
+    # Up-sample quarterly fundamentals to business days and
+    # interpolate between reporting dates
+    funda = (funda.resample("B").interpolate().ffill()
+                   .reindex(df.index).ffill())
 
-    df = df.reindex(funda.index).ffill()
     df = pd.concat([df, funda], axis=1).dropna()
     out = PROC_DIR/f"{ticker}.parquet"
     out.parent.mkdir(parents=True,exist_ok=True)
