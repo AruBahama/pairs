@@ -6,8 +6,8 @@ End‑to‑end research pipeline that discovers statistical‑arbitrage pairs in
 ## Quick start
 
 ```bash
-git clone <your‑fork> pairs_trading_system
-cd pairs_trading_system
+git clone <your‑fork> pairs
+cd pairs
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 python scripts/run_full_pipeline.py
