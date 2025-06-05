@@ -20,7 +20,5 @@ python scripts/run_full_pipeline.py
 
 ## Pipeline Overview
 
-1. **Data collection** → daily OHLCV + fundamentals (FinanceToolkit) aligned to fiscal quarter‑ends
-All notebooks under `/notebooks` are executable in order and call the production code in `src/`.
 
 ---
