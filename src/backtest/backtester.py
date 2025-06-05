@@ -114,7 +114,18 @@ def run_backtests(
         stats = bt.run()
         equity = stats["_equity_curve"]["Equity"]
         returns = equity.pct_change().dropna()
-        metrics = {name: getattr(m, name)(returns) for name in METRICS}
+
+        # Use the spread's own returns as a benchmark for metrics that
+        # require one (e.g. beta and alpha).
+        benchmark = df["spread"].pct_change().dropna().loc[returns.index]
+
+        metrics = {}
+        for name in METRICS:
+            func = getattr(m, name)
+            if name in {"beta", "alpha"}:
+                metrics[name] = func(returns, benchmark)
+            else:
+                metrics[name] = func(returns)
         metrics["Final Equity"] = float(equity.iloc[-1])
         results[pair_name] = metrics
         print(f"Backtested {pair_name}: {metrics}")
