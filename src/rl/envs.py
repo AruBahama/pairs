@@ -35,7 +35,8 @@ class PairTradingEnv(gym.Env):
             self._hr_fn = None
             self._hr_arr = np.ones_like(self.price1)
 
-        self.action_space = spaces.Discrete(3)  # 0=flat,1=long-spread,2=short-spread
+        # 0 = short spread, 1 = flat, 2 = long spread
+        self.action_space = spaces.Discrete(3)
         self.observation_space = spaces.Box(
             low=-np.inf, high=np.inf, shape=(WINDOW_LENGTH,), dtype=np.float32
         )
@@ -58,10 +59,14 @@ class PairTradingEnv(gym.Env):
 
     def _compute_spread(self, start, end):
         hr = self._get_hr_array(start, end)
-        return self.price1[start:end] - hr * self.price2[start:end]
+        spread = self.price1[start:end] - hr * self.price2[start:end]
+        denom = max(abs(spread[0]), 1e-6)
+        return spread / denom
 
     def step(self, action):
         prev_position = self.position
+        new_position = {0: -1, 1: 0, 2: 1}[action]
+        self.position = new_position
         hr_prev = self.prev_hr
         prev_spread = self.price1[self.t - 1] - hr_prev * self.price2[self.t - 1]
 
@@ -71,12 +76,10 @@ class PairTradingEnv(gym.Env):
         current_spread = (
             self.price1[self.t - 1] - hr_prev * self.price2[self.t - 1]
         )
-        pnl = prev_position * (current_spread - prev_spread)
+        pnl = self.position * (current_spread - prev_spread)
         reward = pnl
-        new_position = {0:0,1:1,2:-1}[action]
-        if prev_position * new_position == -1:
+        if prev_position * self.position == -1:
             reward -= SWITCH_PENALTY
-        self.position = new_position
         obs = self._compute_spread(self.t - WINDOW_LENGTH, self.t)
         self.prev_hr = self._get_hr(self.t - 1)
         info = {"pnl": pnl}
