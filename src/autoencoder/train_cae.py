@@ -1,4 +1,3 @@
-
 import json
 import numpy as np
 import pandas as pd
@@ -15,16 +14,19 @@ def train_cae(window_length: int = WINDOW_LENGTH, latent_dim: int = LATENT_DIM, 
     X = pd.concat(dfs).dropna()
     X = scaler.transform(X)
     n_features = X.shape[1]
+
     windows = []
     lengths = []
     idx = 0
     for df in dfs:
-        w = build_windows(pd.DataFrame(X[idx:idx + len(df)], index=df.index), window_length)
+        w = build_windows(
+            pd.DataFrame(X[idx: idx + len(df)], index=df.index),
+            window_length
+        )
         windows.append(w)
         lengths.append(len(w))
         idx += len(df)
     Xw = np.concatenate(windows, axis=0)
-    Xw = Xw[...,np.newaxis]  # add channel dim
 
     model, encoder = build_cae(n_features, window_length, latent_dim)
     LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -35,6 +37,7 @@ def train_cae(window_length: int = WINDOW_LENGTH, latent_dim: int = LATENT_DIM, 
         batch_size=CAE_BATCH_SIZE,
         validation_split=0.1,
     )
+
     if save:
         model.save(LOG_DIR / "cae.h5")
         encoder.save(LOG_DIR / "encoder.h5")
@@ -47,7 +50,7 @@ def train_cae(window_length: int = WINDOW_LENGTH, latent_dim: int = LATENT_DIM, 
     start = 0
     agg = []
     for l in lengths:
-        agg.append(latent[start : start + l].mean(axis=0))
+        agg.append(latent[start: start + l].mean(axis=0))
         start += l
     ticker_latent = np.stack(agg, axis=0)
     if save:
