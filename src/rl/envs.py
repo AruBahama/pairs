@@ -2,6 +2,7 @@
 import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
+import pandas as pd
 from ..config import INIT_CAPITAL, WINDOW_LENGTH, SWITCH_PENALTY
 
 class PairTradingEnv(gym.Env):
@@ -35,7 +36,8 @@ class PairTradingEnv(gym.Env):
             self._hr_fn = None
             self._hr_arr = np.ones_like(self.price1)
 
-        self.action_space = spaces.Discrete(3)  # 0=flat,1=long-spread,2=short-spread
+        # 0 -> short spread, 1 -> flat, 2 -> long spread
+        self.action_space = spaces.Discrete(3)
         self.observation_space = spaces.Box(
             low=-np.inf, high=np.inf, shape=(WINDOW_LENGTH,), dtype=np.float32
         )
@@ -68,19 +70,22 @@ class PairTradingEnv(gym.Env):
         self.t += 1
         done = self.t >= len(self.price1)
 
-        current_spread = (
-            self.price1[self.t - 1] - hr_prev * self.price2[self.t - 1]
-        )
-        pnl = prev_position * (current_spread - prev_spread)
-        reward = pnl
-        new_position = {0:0,1:1,2:-1}[action]
-        if prev_position * new_position == -1:
+        # Observation window after advancing time
+        window = self._compute_spread(self.t - WINDOW_LENGTH, self.t)
+        window_df = pd.DataFrame({"spread": window})
+        denom = max(abs(window_df["spread"].iloc[0]), 1e-6)
+
+        self.position = {0: -1, 1: 0, 2: 1}[action]
+
+        current_spread = window_df["spread"].iloc[-1]
+        pnl = self.position * (current_spread - prev_spread)
+        reward = pnl / denom
+        if prev_position * self.position == -1:
             reward -= SWITCH_PENALTY
-        self.position = new_position
-        obs = self._compute_spread(self.t - WINDOW_LENGTH, self.t)
+
         self.prev_hr = self._get_hr(self.t - 1)
         info = {"pnl": pnl}
-        return obs.astype(np.float32), reward, done, False, info
+        return window.astype(np.float32), reward, done, False, info
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
