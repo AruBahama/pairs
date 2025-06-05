@@ -19,6 +19,7 @@ def train_cae(
     save: bool = True,
     recency_alpha: float = 0.9,
     agg_method: str = "centroids",
+    callbacks: list | None = None,
 ):
     """Train the CAE and return latent representations.
 
@@ -38,6 +39,8 @@ def train_cae(
         runs :class:`~sklearn.cluster.KMeans` with ``n_clusters=2`` and flattens
         the resulting cluster centers. ``"mean_var"`` computes the weighted mean
         and variance using ``recency_alpha``.
+    callbacks : list, optional
+        List of Keras callbacks passed directly to ``model.fit``.
 
     Returns
     -------
@@ -78,6 +81,7 @@ def train_cae(
         epochs=CAE_EPOCHS,
         batch_size=CAE_BATCH_SIZE,
         validation_split=0.1,
+        callbacks=callbacks,
     )
 
     if save:
