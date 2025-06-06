@@ -1,7 +1,7 @@
 
 # Pairs‑Trading System (Deep RL + Clustering)
 
-End‑to‑end research pipeline that discovers statistical‑arbitrage pairs in the S&P 500, clusters them with a convolutional auto‑encoder (CAE), and trains a PPO agent (Ray RLlib) to trade each pair with **$1 000** initial capital.
+End‑to‑end research pipeline that discovers statistical‑arbitrage pairs in the S&P 500, clusters them with a convolutional auto‑encoder (CAE), and trains a PPO agent (Ray RLlib) to trade each pair with **$1 000** initial capital. The RL agent now employs an LSTM‑based recurrent policy and critic so that past observations influence current decisions.
 
 ## Quick Start
 
@@ -30,8 +30,9 @@ backtest. A Mermaid diagram describing how each module connects is available in
 4. **Cluster securities** using `src.clustering.cluster_utils.cluster_latents`.
 5. **Select pairs** with `src.clustering.select_pairs.select_pairs` from each cluster.
 6. **Train agents** on each pair through `src.rl.train_agent.train_all_pairs`.
-   Alternatively run `scripts/train_agents_sb3.py` to use Stable-Baselines3
-   PPO (``gamma=0.99``).
+   The policy and value networks use an LSTM backbone so previous observations
+   are carried across timesteps. Alternatively run `scripts/train_agents_sb3.py`
+   to use Stable-Baselines3 PPO (``gamma=0.99``).
 7. **Backtest results** with `src.backtest.backtester.run_backtests`.
 
 The RL training script uses a lightweight configuration suitable for quick
