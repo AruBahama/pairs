@@ -40,3 +40,17 @@ experiments. Backtests leverage **Backtesting.py** via
 metrics is provided in `src.backtest.metrics`.
 
 ---
+
+### Hedge Ratio Definition
+
+The system uses a volatility- and correlation-adjusted hedge ratio.  Given two
+price series ``A`` and ``B`` the ratio is
+
+``beta = rho * sigma_A / sigma_B``
+
+where ``rho`` is the correlation between the expected price changes
+``ΔA`` and ``ΔB`` and ``sigma_A``/``sigma_B`` are the standard deviations of
+those changes.  This value indicates how many shares of the short leg (``B``)
+neutralize the price risk in the long leg (``A``), allowing the spread to
+capture relative mispricing rather than market drift.
+

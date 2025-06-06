@@ -1,8 +1,13 @@
+"""RL trading environments."""
+
 import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
 import pandas as pd
+
 from ..config import INIT_CAPITAL, WINDOW_LENGTH, SWITCH_PENALTY, STOP_LOSS_LEVEL
+from ..config import INIT_CAPITAL, WINDOW_LENGTH, SWITCH_PENALTY
+from .hedge_utils import calc_hedge_ratio
 
 
 class PairTradingEnv(gym.Env):
@@ -17,8 +22,11 @@ class PairTradingEnv(gym.Env):
         price1_series, price2_series : pandas.Series
             Synchronized price series of the two assets.
         hedge_ratio : array-like or callable, optional
-            Static array of hedge ratios or a function ``f(t)`` returning
-            the ratio at index ``t``.  Defaults to 1.
+            Static array of hedge ratios or a function ``f(t)`` returning the
+            ratio at index ``t``.  If ``None`` the ratio is estimated as
+            ``rho * sigma_A / sigma_B`` where ``rho`` is the correlation between
+            ``Δprice1`` and ``Δprice2`` and ``sigma_A``/``sigma_B`` are their
+            respective standard deviations.
         """
         super().__init__()
 
@@ -35,7 +43,8 @@ class PairTradingEnv(gym.Env):
                 raise ValueError("hedge_ratio length must match price series length")
             self._hr_fn, self._hr_arr = None, hr
         else:
-            self._hr_fn, self._hr_arr = None, np.ones_like(self.price1)
+            hr = calc_hedge_ratio(price1_series, price2_series)
+            self._hr_fn, self._hr_arr = None, np.full_like(self.price1, hr, dtype=float)
 
         # Action mapping: 0 = short spread, 1 = flat, 2 = long spread
         self.action_space = spaces.Discrete(3)
