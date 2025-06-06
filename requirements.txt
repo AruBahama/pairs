@@ -1,9 +1,8 @@
-
 pandas>=2.2
 numpy>=1.26
 yfinance>=0.2
 financetoolkit>=2.0
-pandas-ta>=0.3
+pandas-ta==0.3.14b0
 scikit-learn>=1.5
 tensorflow>=2.16
 ray[rllib]>=2.10
