@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 
 from ..config import INIT_CAPITAL, WINDOW_LENGTH, SWITCH_PENALTY, STOP_LOSS_LEVEL
-from ..config import INIT_CAPITAL, WINDOW_LENGTH, SWITCH_PENALTY
 from .hedge_utils import calc_hedge_ratio
 
 
