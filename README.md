@@ -5,7 +5,7 @@ End‑to‑end research pipeline that discovers statistical‑arbitrage pairs in
 
 ## Quick Start
 
-Clone the repository, install the Python dependencies and run the pipeline:
+Clone the repository, ensure you are using Python 3.10 or higher (tested on Python 3.11), install the Python dependencies and run the pipeline:
 
 ```bash
 git clone <your-fork> pairs
