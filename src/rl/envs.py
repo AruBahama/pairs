@@ -2,7 +2,7 @@ import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
 import pandas as pd
-from ..config import INIT_CAPITAL, WINDOW_LENGTH, SWITCH_PENALTY
+from ..config import INIT_CAPITAL, WINDOW_LENGTH, SWITCH_PENALTY, STOP_LOSS_LEVEL
 
 
 class PairTradingEnv(gym.Env):
@@ -48,6 +48,7 @@ class PairTradingEnv(gym.Env):
         # Internal state
         self.position = 0            # −1 short, 0 flat, +1 long
         self.capital  = INIT_CAPITAL
+        self.stop_loss = STOP_LOSS_LEVEL
         self.t        = WINDOW_LENGTH
         self.prev_hr  = self._get_hr(self.t - 1)
 
@@ -90,21 +91,32 @@ class PairTradingEnv(gym.Env):
 
         # PnL for this step, scaled by |prev_spread| to keep rewards magnitude-stable
         pnl     = self.position * (curr_spread - prev_spread)
+        self.capital += pnl
         reward  = pnl / max(abs(prev_spread), 1e-6)
 
         # Switching penalty
         if prev_position != self.position and prev_position != 0:
             reward -= SWITCH_PENALTY
 
+        # Stop-loss check
+        if self.capital < self.stop_loss:
+            self.position = 0
+            done = True
+            info = {"pnl": pnl, "stop_loss": True}
+            obs = self._compute_spread(self.t - WINDOW_LENGTH, self.t)
+            return obs.astype(np.float32), reward, done, False, info
+
         # Observation = most-recent WINDOW_LENGTH normalised spreads
         obs = self._compute_spread(self.t - WINDOW_LENGTH, self.t)
 
-        info = {"pnl": pnl}
+        info = {"pnl": pnl, "stop_loss": False}
         return obs.astype(np.float32), reward, done, False, info
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
         self.position = 0
+        self.capital  = INIT_CAPITAL
+        self.stop_loss = STOP_LOSS_LEVEL
         self.t        = WINDOW_LENGTH
         self.prev_hr  = self._get_hr(self.t - 1)
         obs = self._compute_spread(0, self.t)

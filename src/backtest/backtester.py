@@ -9,7 +9,14 @@ import pandas as pd
 from backtesting import Backtest, Strategy
 from ray.rllib.algorithms.algorithm import Algorithm
 
-from ..config import LOG_DIR, PROC_DIR, INIT_CAPITAL, WINDOW_LENGTH, METRICS
+from ..config import (
+    LOG_DIR,
+    PROC_DIR,
+    INIT_CAPITAL,
+    WINDOW_LENGTH,
+    METRICS,
+    STOP_LOSS_LEVEL,
+)
 from . import metrics as m
 
 
@@ -40,8 +47,18 @@ class RLPairStrategy(Strategy):
     def init(self) -> None:
         self.agent = _load_checkpoint(Path(self.ckpt_dir))
         self.state = self.agent.get_initial_state()
+        self.stop_trading = False
 
     def next(self) -> None:
+        if self.stop_trading:
+            return
+
+        if self.equity < STOP_LOSS_LEVEL:
+            if self.position:
+                self.position.close()
+            self.stop_trading = True
+            return
+
         obs = self.data.Close[-WINDOW_LENGTH:].values.astype("float32")
         action, self.state, _ = self.agent.compute_single_action(
             obs, state=self.state
