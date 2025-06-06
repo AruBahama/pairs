@@ -85,4 +85,7 @@ def train_all_pairs(pairs: Iterable[tuple[str, str]] | None = None) -> None:
 
 
 if __name__ == "__main__":
+    from ..preflight import run_checks
+
+    run_checks()
     train_all_pairs()

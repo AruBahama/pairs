@@ -63,4 +63,7 @@ def train_all_pairs_sb3(
 
 
 if __name__ == "__main__":
+    from ..preflight import run_checks
+
+    run_checks()
     train_all_pairs_sb3()

@@ -15,6 +15,9 @@ pip install -r requirements.txt
 python scripts/run_full_pipeline.py
 ```
 
+The pipeline performs basic pre-flight checks and stops on the first
+failing stage so errors are visible immediately.
+
 This single command downloads data, trains the ML models and runs a
 backtest. A Mermaid diagram describing how each module connects is available in
 [docs/pipeline_flow.html](docs/pipeline_flow.html).
