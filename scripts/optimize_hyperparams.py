@@ -3,6 +3,7 @@
 import optuna
 import tensorflow as tf
 from sklearn.metrics import calinski_harabasz_score
+from src.preflight import run_checks
 from src.autoencoder.train_cae import train_cae
 from src.clustering.cluster_utils import cluster_latents
 from src.config import LOG_DIR
@@ -29,6 +30,8 @@ def objective(trial: optuna.Trial) -> float:
 
 
 def main() -> None:
+    run_checks()
+
     study = optuna.create_study()
     study.optimize(objective, n_trials=10)
     study.trials_dataframe().to_csv(LOG_DIR/"optuna_trials.csv", index=False)

@@ -1,6 +1,9 @@
 """Convenience script to run the full research pipeline."""
 
 import logging
+import sys
+
+from src.preflight import run_checks
 
 from src.data.downloader import batch as dl
 from src.data.feature_engineer import batch as fe
@@ -26,15 +29,19 @@ STEPS = [
 def main() -> None:
     """Run each stage of the pipeline sequentially.
 
-    Errors in a stage are logged but do not abort the remaining steps.
+    The script stops at the first failing stage instead of silently
+    continuing through the pipeline.
     """
 
+    run_checks()
+
     for name, func in STEPS:
+        logger.info("Starting %s", name)
         try:
-            logger.info("Starting %s", name)
             func()
-        except Exception as exc:  # noqa: BLE001
-            logger.error("Stage %s failed: %s", name, exc)
+        except Exception:  # noqa: BLE001
+            logger.exception("Stage %s failed", name)
+            sys.exit(1)
 
 if __name__ == '__main__':
     main()
