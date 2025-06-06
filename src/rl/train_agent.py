@@ -11,7 +11,7 @@ import logging
 from ray.rllib.algorithms.ppo import PPO
 
 from .envs import PairTradingEnv
-from ..config import LOG_DIR, PROC_DIR, NUM_WORKERS
+from ..config import LOG_DIR, PROC_DIR, NUM_WORKERS, WINDOW_LENGTH
 
 logging.basicConfig(format="%(asctime)s %(levelname)s:%(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -44,6 +44,13 @@ def _train_pair(t1: str, t2: str) -> None:
             "framework": "torch",
             "num_workers": NUM_WORKERS,
             "train_batch_size": 4000,
+            # Use an LSTM-based policy and value network to retain a hidden state
+            # of previous observations when optimising the policy and Q-values.
+            "model": {
+                "use_lstm": True,
+                "max_seq_len": WINDOW_LENGTH,
+                "lstm_cell_size": 128,
+            },
         },
     )
 
