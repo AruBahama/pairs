@@ -5,8 +5,8 @@ financetoolkit>=2.0
 pandas-ta==0.3.14b0
 scikit-learn>=1.5
 tensorflow>=2.16
-ray[rllib]>=2.10
-gymnasium>=0.29
+ray[rllib]==2.10.0
+gymnasium==0.28.1
 scipy>=1.11
 matplotlib>=3.9
 seaborn>=0.13
