@@ -57,7 +57,7 @@ class PairTradingEnv(gym.Env):
         self.position = 0            # −1 short, 0 flat, +1 long
         self.capital  = INIT_CAPITAL
         self.stop_loss = STOP_LOSS_LEVEL
-        self.t        = WINDOW_LENGTH
+        self.t        = min(WINDOW_LENGTH, len(self.price1))
         self.prev_hr  = self._get_hr(self.t - 1)
 
     # --------------------------------------------------------------------- #
@@ -72,11 +72,22 @@ class PairTradingEnv(gym.Env):
         return self._hr_arr[start:end]
 
     def _compute_spread(self, start: int, end: int):
-        """Return normalised spread for the window [start, end)."""
-        hr      = self._get_hr_array(start, end)
-        spread  = self.price1[start:end] - hr * self.price2[start:end]
-        denom   = max(abs(spread[0]), 1e-6)           # avoid /0
-        return spread / denom
+        """Return normalised spread for the window [start, end) padded to
+        ``WINDOW_LENGTH``."""
+
+        start = max(start, 0)
+        hr     = self._get_hr_array(start, end)
+        spread = self.price1[start:end] - hr * self.price2[start:end]
+        if len(spread) == 0:
+            return np.zeros(WINDOW_LENGTH, dtype=float)
+
+        denom  = max(abs(spread[0]), 1e-6)  # avoid /0
+        spread = spread / denom
+
+        if len(spread) < WINDOW_LENGTH:
+            pad_width = WINDOW_LENGTH - len(spread)
+            spread = np.pad(spread, (pad_width, 0), "constant")
+        return spread
 
     # --------------------------------------------------------------------- #
     # Gym API
@@ -93,9 +104,13 @@ class PairTradingEnv(gym.Env):
         self.t += 1
         done = self.t >= len(self.price1)
 
-        # Current spread (use *current* hedge ratio)
-        self.prev_hr = self._get_hr(self.t - 1)
-        curr_spread  = self.price1[self.t - 1] - self.prev_hr * self.price2[self.t - 1]
+        curr_spread = prev_spread
+        if not done:
+            # Current spread (use *current* hedge ratio)
+            self.prev_hr = self._get_hr(self.t - 1)
+            curr_spread = (
+                self.price1[self.t - 1] - self.prev_hr * self.price2[self.t - 1]
+            )
 
         # PnL for this step, scaled by |prev_spread| to keep rewards magnitude-stable
         pnl     = self.position * (curr_spread - prev_spread)
@@ -111,11 +126,11 @@ class PairTradingEnv(gym.Env):
             self.position = 0
             done = True
             info = {"pnl": pnl, "stop_loss": True}
-            obs = self._compute_spread(self.t - WINDOW_LENGTH, self.t)
+            obs = self._compute_spread(max(0, self.t - WINDOW_LENGTH), self.t)
             return obs.astype(np.float32), reward, done, False, info
 
         # Observation = most-recent WINDOW_LENGTH normalised spreads
-        obs = self._compute_spread(self.t - WINDOW_LENGTH, self.t)
+        obs = self._compute_spread(max(0, self.t - WINDOW_LENGTH), self.t)
 
         info = {"pnl": pnl, "stop_loss": False}
         return obs.astype(np.float32), reward, done, False, info
@@ -125,7 +140,7 @@ class PairTradingEnv(gym.Env):
         self.position = 0
         self.capital  = INIT_CAPITAL
         self.stop_loss = STOP_LOSS_LEVEL
-        self.t        = WINDOW_LENGTH
+        self.t        = min(WINDOW_LENGTH, len(self.price1))
         self.prev_hr  = self._get_hr(self.t - 1)
         obs = self._compute_spread(0, self.t)
         return obs.astype(np.float32), {}
