@@ -5,10 +5,14 @@ import pytest
 
 pytest.importorskip('gymnasium')
 
-from src.rl.envs import PairTradingEnv
+from src.rl import envs as env_mod
+from src import config
+PairTradingEnv = env_mod.PairTradingEnv
 
 
-def test_env_basic_step():
+def test_env_basic_step(monkeypatch):
+    monkeypatch.setattr(config, "WINDOW_LENGTH", 3)
+    monkeypatch.setattr(env_mod, "WINDOW_LENGTH", 3)
     price1 = pd.Series(np.arange(10, dtype=float))
     price2 = pd.Series(np.arange(10, dtype=float))
     env = PairTradingEnv(price1, price2)
