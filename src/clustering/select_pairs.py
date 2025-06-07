@@ -21,7 +21,7 @@ def select_pairs():
         dists = cdist(Z[idx], Z[idx], metric='euclidean')
         triu = np.triu_indices_from(dists, k=1)
         sorted_pairs = sorted(zip(triu[0], triu[1], dists[triu]), key=lambda x: x[2])
-        top = sorted_pairs[:PAIRS_PER_CLUST]
+        top = sorted_pairs[:min(PAIRS_PER_CLUST, len(sorted_pairs))]
         pairs.extend([(tickers[idx[i]], tickers[idx[j]]) for i, j, _ in top])
 
     # Save as numpy array of strings for later steps
