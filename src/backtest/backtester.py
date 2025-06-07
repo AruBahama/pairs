@@ -110,6 +110,9 @@ def run_backtests(
         price1 = _load_prices(t1)
         price2 = _load_prices(t2)
         df = pd.DataFrame({"spread": price1 - price2})
+        # Feed the spread into Backtesting.py by duplicating it across the
+        # OHLC columns.  Backtesting.py expects an OHLC dataframe even if the
+        # strategy trades a synthetic instrument such as a spread.
         df_bt = pd.DataFrame(
             {
                 "Open": df["spread"],
@@ -124,7 +127,8 @@ def run_backtests(
             df_bt,
             RLPairStrategy,
             cash=INIT_CAPITAL,
-            commission=0.0,
+            commission=0.0005,
+            slippage=0.0005,
             strategy_kwargs={"ckpt_dir": LOG_DIR / f"{t1}_{t2}"},
         )
 
