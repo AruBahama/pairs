@@ -26,6 +26,7 @@ def batch():
           .dropna()
           .tolist()
     )
+    RAW_DIR.mkdir(parents=True, exist_ok=True)
     for t in tickers:
         print('↓',t)
         download(t.strip())

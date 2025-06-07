@@ -14,16 +14,21 @@ def cluster_latents(
     """Cluster latent vectors and optionally save the labels."""
 
     save_output = Z is None
+    scaler_path = LOG_DIR / "cluster_scaler.joblib"
     if Z is None:
         if not path.exists():
             raise FileNotFoundError(f"{path} missing – run train_cae() first")
         Z = np.load(path)
         scaler = StandardScaler()
         Zs = scaler.fit_transform(Z)
-        joblib.dump(scaler, LOG_DIR / "cluster_scaler.joblib")
+        joblib.dump(scaler, scaler_path)
     else:
-        scaler = StandardScaler()
-        Zs = scaler.fit_transform(Z)
+        if scaler_path.exists():
+            scaler = joblib.load(scaler_path)
+            Zs = scaler.transform(Z)
+        else:
+            scaler = StandardScaler()
+            Zs = scaler.fit_transform(Z)
 
     clust = AgglomerativeClustering(n_clusters=n_clusters, linkage="ward")
     labels = clust.fit_predict(Zs)
