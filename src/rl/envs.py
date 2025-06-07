@@ -83,8 +83,10 @@ class PairTradingEnv(gym.Env):
     # --------------------------------------------------------------------- #
     def step(self, action: int):
         """Advance one time-step and return (obs, reward, done, trunc, info)."""
+        if action not in (0, 1, 2):
+            raise ValueError(f"invalid action {action}; must be 0, 1, or 2")
         prev_position = self.position
-        self.position = {-1: -1, 0: 0, 1: 1}.get({0: -1, 1: 0, 2: 1}[action], 0)
+        self.position = {0: -1, 1: 0, 2: 1}[action]
 
         # Spread at t-1 with previous hedge ratio
         prev_spread = self.price1[self.t - 1] - self.prev_hr * self.price2[self.t - 1]
